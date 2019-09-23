@@ -1,0 +1,23 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danalittleskier/bamazon.git"
+  },
+  "author": "Dana Alexandrescu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danalittleskier/bamazon/issues"
+  },
+  "homepage": "https://github.com/danalittleskier/bamazon#readme",
+  "dependencies": {
+    "inquirer": "^7.0.0",
+    "mysql": "^2.17.1"
+  }
+}
