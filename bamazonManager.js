@@ -120,6 +120,53 @@ function addtoInventory(){
 });
 }
 
+function addNewProduct() {
+    console.log("Inserting a new product...\n");
+    inquirer
+    .prompt([{
+      name: "itemID",
+      type: "input",
+      message: "What is the item ID of the new product?"
+    },
+    {
+        name: "prodName",
+        type: "input",
+        message: "What is the name of the new product?"
+    },
+    {
+        name: "deptName",
+        type: "input",
+        message: "What is department the product belongs to?"
+    },
+    {
+        name: "prodPrice",
+        type: "input",
+        message: "What is the price of the new product?"
+    },
+    {
+      name: "prodQuantity",
+      type: "input",
+      message: "How much quantity would you like to add?"
+    }])
+    .then(function(answer) {
+
+    var query = connection.query("INSERT INTO products SET ?",
+      {
+        item_id: answer.itemID,
+        product_name: answer.prodName,
+        department_name: answer.deptName,
+        price: answer.prodPrice,
+        stock_quantity: answer.prodQuantity
+      },
+      function(err, res) {
+        if (err) throw err;
+        console.log(res.affectedRows + " product inserted!\n");
+        showInventory();
+      }
+    );
+    });
+  }
+
 function displayItems(res) {
     res.map(function (element) {
         var line = element.item_id + " || " + element.product_name + " || " + element.department_name + " || " + element.price + " || " + element.stock_quantity + "\n";
