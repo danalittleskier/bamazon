@@ -36,6 +36,9 @@ function optionsMenu() {
         ]
       })
       .then(function(answer) {
+        if(answer === undefined){
+            console.log("Not a valid entry");
+        }
         switch (answer.options) {
         case "View Products for Sale":
             showInventory();
@@ -46,11 +49,11 @@ function optionsMenu() {
           break;
   
         case "Add to Inventory":
-          rangeSearch();
+          addtoInventory();
           break;
   
         case "Add New Product":
-          songSearch();
+          addNewProduct();
           break;
   
         case "exit":
@@ -78,7 +81,44 @@ function showLowInventory() {
     });
 }
 
-
+function addtoInventory(){
+    console.log("Adding to inventory...\n");
+    inquirer
+    .prompt([{
+      name: "itemID",
+      type: "input",
+      message: "Which item id would you like to update?"
+    },
+    {
+      name: "addQuantity",
+      type: "input",
+      message: "Which quantity would you like to add?"
+    }])
+    .then(function(answer) {
+    var queryGetQuantity = connection.query("SELECT * from products where ? ", 
+    { 
+        item_id: answer.itemID
+    },
+    function(err, res){
+        if (err) throw err;
+        var newQuantity = parseInt(res[0].stock_quantity) + parseInt(answer.addQuantity);
+        
+        var query = connection.query("UPDATE products SET ? WHERE ?",
+        [{
+            stock_quantity: newQuantity
+          },
+          {
+            item_id: answer.itemID
+          }],
+        function(err, res) {
+          if (err) throw err;
+          console.log(res.affectedRows + " products updated!\n"); 
+          showInventory();      
+        }
+      );
+    });
+});
+}
 
 function displayItems(res) {
     res.map(function (element) {
