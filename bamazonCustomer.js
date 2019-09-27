@@ -54,8 +54,10 @@ function buyerPrompt() {
 
                     if (res[0].stock_quantity > answer.quantity) {
                         var newQuantity = res[0].stock_quantity - answer.quantity;
-                        updateProductQuantity(res[0].item_id, newQuantity);
-                        console.log("Purchase complete! Total cost " + answer.quantity * res[0].price);
+                        var totalCost = answer.quantity * res[0].price;
+                        var totalProductSales = res[0].product_sales + totalCost;
+                        updateProductQuantity(res[0].item_id, newQuantity, totalProductSales);
+                        console.log("Purchase complete! Total cost " + totalCost);
                         readProductsByID(res[0].item_id);
                         //connection.end();
                     }
@@ -88,12 +90,13 @@ function readProductsByID(id) {
     });
 }
 
-function updateProductQuantity(id, quantity) {
+function updateProductQuantity(id, quantity, productSales) {
     console.log("Updating product where id = " + id + "\n");
 
     connection.query("UPDATE products set ? where ?",
         [{
-            stock_quantity: quantity
+            stock_quantity: quantity,
+            product_sales: productSales
         },
         {
             item_id: id

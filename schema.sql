@@ -13,6 +13,14 @@ CREATE TABLE products (
   PRIMARY KEY (item_id)
 );
 
+create table departments (
+  department_id INT NOT NULL,
+  department_name VARCHAR(50) NOT NULL,
+  over_head_costs DECIMAL(10,2) NULL
+);
+
+ALTER TABLE products
+  ADD product_sales DECIMAL(10,2) NULL;
 
 INSERT INTO products (item_id, product_name, department_name, price, stock_quantity)
 VALUES (1, "IPhone", "Electronics", 575.00, 5), (2, "Road Bicycle", "Sports", 1000.00, 3), (3, "Saxofone", "Music", 800.00, 1);
