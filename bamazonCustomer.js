@@ -2,6 +2,7 @@ var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require('cli-table');
 
+//set up connections to the database
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -16,12 +17,39 @@ var connection = mysql.createConnection({
     database: "bamazon"
 });
 
+//create connections and output inventory
 connection.connect(function (err) {
     if (err) throw err;
     //console.log("connected as id " + connection.threadId + "\n");
     readProducts();
 });
 
+//a prompt that shows a couple choices with an exit option
+function mainMenu(){
+    inquirer
+        .prompt({
+            name: "options",
+            type: "list",
+            message: "What would you like to do?",
+            choices: [
+                "Buy a product",
+                "exit"
+            ]
+        })
+        .then(function(answer){
+            switch (answer.options) {
+                case "Buy a product":
+                    buyerPrompt();
+                    break;
+                case "exit":
+                    connection.end();
+                    break;
+
+            }
+        });
+}
+
+//The prompt that grabs user input for buying a product
 function buyerPrompt() {
     inquirer
         .prompt([{
@@ -48,7 +76,7 @@ function buyerPrompt() {
         }
         ])
         .then(function (answer) {
-            // based on their answer, either call the bid or the post functions
+            // based on their answer, if the product id exists search products table and take it out of inventory
             if (answer.product_id > 0) {
                 var query = "SELECT * FROM products where ?";
                 connection.query(query, { item_id: answer.product_id }, function (err, res) {
@@ -58,39 +86,42 @@ function buyerPrompt() {
                         var totalCost = answer.quantity * res[0].price;
                         var totalProductSales = res[0].product_sales + totalCost;
                         updateProductQuantity(res[0].item_id, newQuantity, totalProductSales);
-                        console.log("Purchase complete! Total cost " + totalCost);
+                        console.log("Purchase complete! Total cost " + totalCost + "! \n\n");
                         readProductsByID(res[0].item_id);
-                        //connection.end();
+                        connection.end();
                     }
                     else {
-                        console.log("Insufficient quantity!");
+                        console.log("Insufficient quantity! \n\n");
+                        mainMenu();
                     }
                 });
             }
             else {
-                console.log("Not a valid id!");
-                connection.end();
+                console.log("Not a valid id! \n\n");
+                mainMenu();
             }
         });
 }
 
+//get all products from table
 function readProducts() {
     console.log("Selecting all products...\n");
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         displayItems(res);
-        buyerPrompt();
+        mainMenu();
     });
 }
 
+//get product by a given id
 function readProductsByID(id) {
-    console.log("Selecting product by id...\n");
     connection.query("SELECT * FROM products where ?", { item_id: id }, function (err, res) {
         if (err) throw err;
         displayItems(res);
     });
 }
 
+//update inventory by decreasing the product quantity and updating the total sales
 function updateProductQuantity(id, quantity, productSales) {
     console.log("Updating product where id = " + id + "\n");
 
@@ -110,6 +141,7 @@ function updateProductQuantity(id, quantity, productSales) {
 
 }
 
+//function that uses the table-cli module to display results in a pre defined table
 function displayItems(res) {
     var table = new Table({
         head: ['Item ID', 'Product Name', 'Department Name', 'Price', 'Stock Quantity', 'Product Sales']
@@ -117,8 +149,6 @@ function displayItems(res) {
     });
 
     res.map(function (element) {
-        //var line = element.item_id + " || " + element.product_name + " || " + element.department_name + " || " + element.price + " || " + element.stock_quantity + "\n";
-        // console.log(line);
         table.push([element.item_id, element.product_name, element.department_name,element.price, element.stock_quantity, element.product_sales] );
     });
     console.log(table.toString());

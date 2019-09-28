@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('cli-table');
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -108,16 +109,26 @@ function showInventory() {
     });
 }
 
-function displayItemsJoin(res) {
-    res.map(function (element) {
-        var line = element.department_id + " || " + element.department_name + " || " + element.over_head_costs + " || " + element.product_sales + " || " + element.total_profit + "\n";
-        console.log(line);
+function displayItems(res) {
+    var table = new Table({
+        head: ['Department ID', 'Department Name', 'Overhead Costs']
+      , colWidths: [20, 20, 20]
     });
+
+    res.map(function (element) {
+        table.push([element.department_id , element.department_name, element.over_head_costs] );
+    });
+    console.log(table.toString());
 }
 
-function displayItems(res) {
-    res.map(function (element) {
-        var line = element.department_id + " || " + element.department_name + " || " + element.over_head_costs + "\n";
-        console.log(line);
+function displayItemsJoin(res) {
+    var table = new Table({
+        head: ['Department ID', 'Department Name', 'Overhead Costs', 'Product Sales', 'Total Profit']
+      , colWidths: [20, 20, 20, 20, 20]
     });
+
+    res.map(function (element) {
+        table.push([element.department_id , element.department_name, element.over_head_costs, element.product_sales,element.total_profit ] );
+    });
+    console.log(table.toString());
 }

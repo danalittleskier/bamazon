@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('cli-table');
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -113,9 +114,9 @@ function addtoInventory(){
         function(err, res) {
           if (err) throw err;
           console.log(res.affectedRows + " products updated!\n"); 
-          showInventory();      
+          readProductsByID(answer.itemID);    
         }
-      );
+      ); 
     });
 });
 }
@@ -126,7 +127,13 @@ function addNewProduct() {
     .prompt([{
       name: "itemID",
       type: "input",
-      message: "What is the item ID of the new product?"
+      message: "What is the item ID of the new product?",
+      validate: function (value) {
+        if (isNaN(value) === false) {
+            return true;
+        }
+        return false;
+    }
     },
     {
         name: "prodName",
@@ -141,12 +148,24 @@ function addNewProduct() {
     {
         name: "prodPrice",
         type: "input",
-        message: "What is the price of the new product?"
+        message: "What is the price of the new product?",
+        validate: function (value) {
+          if (isNaN(value) === false) {
+              return true;
+          }
+          return false;
+      }
     },
     {
       name: "prodQuantity",
       type: "input",
-      message: "How much quantity would you like to add?"
+      message: "How much quantity would you like to add?",
+      validate: function (value) {
+        if (isNaN(value) === false) {
+            return true;
+        }
+        return false;
+    }
     }])
     .then(function(answer) {
 
@@ -161,15 +180,29 @@ function addNewProduct() {
       function(err, res) {
         if (err) throw err;
         console.log(res.affectedRows + " product inserted!\n");
-        showInventory();
+        readProductsByID(answer.itemID);
       }
     );
     });
   }
 
-function displayItems(res) {
-    res.map(function (element) {
-        var line = element.item_id + " || " + element.product_name + " || " + element.department_name + " || " + element.price + " || " + element.stock_quantity + "\n";
-        console.log(line);
+function readProductsByID(id) {
+    connection.query("SELECT * FROM products where ?", { item_id: id }, function (err, res) {
+        if (err) throw err;
+        displayItems(res);
+        optionsMenu(); 
     });
+}
+
+//function that uses the table-cli module to display results in a pre defined table
+function displayItems(res) {
+  var table = new Table({
+      head: ['Item ID', 'Product Name', 'Department Name', 'Price', 'Stock Quantity', 'Product Sales']
+    , colWidths: [20, 20, 20, 20, 20, 20]
+  });
+
+  res.map(function (element) {
+      table.push([element.item_id, element.product_name, element.department_name,element.price, element.stock_quantity, element.product_sales] );
+  });
+  console.log(table.toString());
 }
