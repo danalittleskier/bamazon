@@ -18,7 +18,7 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     //console.log("connected as id " + connection.threadId + "\n");
-    optionsMenu();
+    supervisonMenu();
 });
 
 
@@ -53,16 +53,22 @@ function supervisonMenu() {
 
 function viewSalesByDept(){
         console.log("Selecting all sales by dept...\n");
-        connection.query("SELECT d.department_id, d.department_name," 
-       + "d.over_head_costs, p.product_sales",
-       +" sum(p.product_sales - d.over_head_costs) as total_profit "
-       +" FROM products p, departments d "
-       +" where p.department_name = d.department_name "
-       +" group by d.department_id, d.department_name, d.over_head_costs, p.product_sales;", 
-        
+        connection.query(`SELECT d.department_id, d.department_name, 
+        d.over_head_costs, p.product_sales,
+        sum(p.product_sales - d.over_head_costs) as total_profit 
+        FROM products p, departments d
+        where p.department_name = d.department_name
+        group by d.department_id, d.department_name, d.over_head_costs, p.product_sales;`,        
         function (err, res) {
             if (err) throw err;
             displayItems(res);
-            optionsMenu();
+            supervisonMenu();
         });
+}
+
+function displayItems(res) {
+    res.map(function (element) {
+        var line = element.department_id + " || " + element.department_name + " || " + element.over_head_costs + " || " + element.product_sales + " || " + element.total_profit + "\n";
+        console.log(line);
+    });
 }
