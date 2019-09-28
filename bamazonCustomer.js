@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('cli-table');
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -110,9 +111,16 @@ function updateProductQuantity(id, quantity, productSales) {
 }
 
 function displayItems(res) {
-    res.map(function (element) {
-        var line = element.item_id + " || " + element.product_name + " || " + element.department_name + " || " + element.price + " || " + element.stock_quantity + "\n";
-        console.log(line);
+    var table = new Table({
+        head: ['Item ID', 'Product Name', 'Department Name', 'Price', 'Stock Quantity', 'Product Sales']
+      , colWidths: [20, 20, 20, 20, 20, 20]
     });
+
+    res.map(function (element) {
+        //var line = element.item_id + " || " + element.product_name + " || " + element.department_name + " || " + element.price + " || " + element.stock_quantity + "\n";
+        // console.log(line);
+        table.push([element.item_id, element.product_name, element.department_name,element.price, element.stock_quantity, element.product_sales] );
+    });
+    console.log(table.toString());
 }
 
