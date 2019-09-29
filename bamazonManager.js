@@ -88,7 +88,13 @@ function addtoInventory(){
     .prompt([{
       name: "itemID",
       type: "input",
-      message: "Which item id would you like to update?"
+      message: "Which item id would you like to update?",
+      validate: function (value) {
+        if (isNaN(value) === false) {
+            return true;
+        }
+        return false;
+    }
     },
     {
       name: "addQuantity",

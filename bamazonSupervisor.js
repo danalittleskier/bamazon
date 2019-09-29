@@ -58,11 +58,12 @@ function supervisorMenu() {
 function viewSalesByDept() {
     console.log("Selecting all sales by dept...\n");
     connection.query(`SELECT d.department_id, d.department_name, 
-        d.over_head_costs, p.product_sales,
-        sum(p.product_sales - d.over_head_costs) as total_profit 
+        d.over_head_costs, sum(p.product_sales) as total_sales,
+        sum(p.product_sales) - d.over_head_costs as total_profit
         FROM products p, departments d
         where p.department_name = d.department_name
-        group by d.department_id, d.department_name, d.over_head_costs, p.product_sales;`,
+        group by d.department_id, d.department_name, d.over_head_costs
+        order by d.department_id asc;`,
         function (err, res) {
             if (err) throw err;
             displayItemsJoin(res);
@@ -128,7 +129,7 @@ function displayItemsJoin(res) {
     });
 
     res.map(function (element) {
-        table.push([element.department_id , element.department_name, element.over_head_costs, element.product_sales,element.total_profit ] );
+        table.push([element.department_id , element.department_name, element.over_head_costs, element.total_sales,element.total_profit ] );
     });
     console.log(table.toString());
 }
