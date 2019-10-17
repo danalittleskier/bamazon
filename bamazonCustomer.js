@@ -78,10 +78,15 @@ function buyerPrompt() {
         .then(function (answer) {
             // based on their answer, if the product id exists search products table and take it out of inventory
             if (answer.product_id > 0) {
+
                 var query = "SELECT * FROM products where ?";
                 connection.query(query, { item_id: answer.product_id }, function (err, res) {
-
-                    if (res[0].stock_quantity > answer.quantity) {
+                    console.log(res);
+                    if(res[0] === undefined){
+                        console.log("That inventory id does not exist in the database! \n\n");
+                        mainMenu();
+                    }
+                    else if (res[0].stock_quantity >= answer.quantity) {
                         var newQuantity = res[0].stock_quantity - answer.quantity;
                         var totalCost = answer.quantity * res[0].price;
                         var totalProductSales = res[0].product_sales + totalCost;
