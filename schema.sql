@@ -5,18 +5,18 @@ CREATE DATABASE bamazon;
 USE bamazon;
 
 CREATE TABLE products (
-  item_id INT NOT NULL
+  item_id INT NOT NULL,
   product_name VARCHAR(75) NULL,
   department_name VARCHAR(50),
-  price DECIMAL(10,2) NULL,
-  stock_quantity INT NULL,
+  price DECIMAL(10,2) NULL DEFAULT 0,
+  stock_quantity INT NULL DEFAULT 0,
   PRIMARY KEY (item_id)
 );
 
 create table departments (
   department_id INT NOT NULL AUTO_INCREMENT,
   department_name VARCHAR(50) NOT NULL,
-  over_head_costs DECIMAL(10,2) NULL
+  over_head_costs DECIMAL(10,2) NULL,
   PRIMARY KEY (department_id)
 );
 
